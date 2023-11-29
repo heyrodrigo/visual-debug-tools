@@ -11,7 +11,7 @@ https://github.com/heyrodrigo/visual-debug-tools
 To visually debug a view just add the view modifier `.debug()`. This will show the views bounds and size.
 
 ```swift
-struct TestView: View {
+struct DemoView: View {
     
     var title:String
     
