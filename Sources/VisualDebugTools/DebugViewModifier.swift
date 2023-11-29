@@ -9,11 +9,9 @@
 import Foundation
 import SwiftUI
 
-
 public struct DebugViewModifier: ViewModifier {
     
     var color:Color
-    var borderColor:Color
     var showSize:Bool
     var showBorder:Bool
     
@@ -24,36 +22,14 @@ public struct DebugViewModifier: ViewModifier {
                     .overlay(
                         Text("\(String(format: "%.0f", geometry.size.width))x\(String(format: "%.0f", geometry.size.height))")
                             .padding(4)
+                            .foregroundColor(.white)
                             .background(color)
                             .opacity(showSize ? 1 : 0)
-                            .foregroundColor(borderColor)
                         
                     )
                     .overlay(
-                        
-                        // Corner markers
-                        Path{ path in
-                            // Top left corner
-                            path.move(to: CGPoint(x: 0, y: geometry.size.height * 0.45))
-                            path.addLine(to: CGPoint(x: 0, y: 0))
-                            path.addLine(to: CGPoint(x: geometry.size.width * 0.45, y: 0))
-                            
-                            // Top right corner
-                            path.move(to: CGPoint(x: geometry.size.width * 0.55, y: 0))
-                            path.addLine(to: CGPoint(x: geometry.size.width, y: 0))
-                            path.addLine(to: CGPoint(x: geometry.size.width, y: geometry.size.height * 0.45))
-                            
-                            // Bottom right corner
-                            path.move(to: CGPoint(x: geometry.size.width, y: geometry.size.height * 0.55))
-                            path.addLine(to: CGPoint(x: geometry.size.width, y: geometry.size.height))
-                            path.addLine(to: CGPoint(x: geometry.size.width * 0.55, y: geometry.size.height))
-                            
-                            // Bottom left corner
-                            path.move(to: CGPoint(x: geometry.size.width * 0.45, y: geometry.size.height))
-                            path.addLine(to: CGPoint(x: 0, y: geometry.size.height))
-                            path.addLine(to: CGPoint(x: 0, y: geometry.size.height * 0.55))
-                        }
-                            .stroke(showBorder ? borderColor : .clear, lineWidth: 3)
+                        CrosshairBorderShape()
+                            .strokeBorder(showBorder ? color : .clear, lineWidth: 3)
                         
                     )
                     .allowsHitTesting(false)
@@ -62,7 +38,50 @@ public struct DebugViewModifier: ViewModifier {
 }
 
 public extension View {
-    func debug(color:Color = .green, borderColor:Color = .white, showSize:Bool = true, showBorder:Bool = false) -> some View {
-        self.modifier(DebugViewModifier(color: color, borderColor: borderColor, showSize:showSize, showBorder:showBorder))
+    func debug(color:Color = .green, showSize:Bool = true, showBorder:Bool = true) -> some View {
+        self.modifier(DebugViewModifier(color: color, showSize:showSize, showBorder:showBorder))
+    }
+}
+
+
+private struct CrosshairBorderShape:InsettableShape{
+    
+    var insetAmount:Double = 0.0
+    
+    func path(in rect: CGRect) -> Path {
+        
+        // Makes lines start at 25 or 75 percent of max widht/height
+        let minPercentage:Double = 0.25
+        let maxPercentage:Double = 0.75
+        
+        // Draws path
+        let path = Path{ path in
+            // Top left corner
+            path.move(to: CGPoint(x: insetAmount, y: rect.size.height * minPercentage))
+            path.addLine(to: CGPoint(x: insetAmount, y: insetAmount))
+            path.addLine(to: CGPoint(x: rect.size.width * minPercentage, y: insetAmount))
+            
+            // Top right corner
+            path.move(to: CGPoint(x: rect.size.width * maxPercentage, y: insetAmount))
+            path.addLine(to: CGPoint(x: rect.size.width - insetAmount, y: insetAmount))
+            path.addLine(to: CGPoint(x: rect.size.width - insetAmount, y: rect.size.height * minPercentage))
+            
+            // Bottom right corner
+            path.move(to: CGPoint(x: rect.size.width - insetAmount, y: rect.size.height * maxPercentage))
+            path.addLine(to: CGPoint(x: rect.size.width - insetAmount, y: rect.size.height - insetAmount))
+            path.addLine(to: CGPoint(x: rect.size.width * maxPercentage, y: rect.size.height - insetAmount))
+            
+            // Bottom left corner
+            path.move(to: CGPoint(x: rect.size.width * minPercentage, y: rect.size.height - insetAmount))
+            path.addLine(to: CGPoint(x: insetAmount, y: rect.size.height - insetAmount))
+            path.addLine(to: CGPoint(x: insetAmount, y: rect.size.height * maxPercentage))
+        }
+        return path
+    }
+    
+    func inset(by amount: CGFloat) -> some InsettableShape {
+        var shape = self
+        shape.insetAmount += amount
+        return shape
     }
 }
