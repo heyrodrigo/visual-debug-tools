@@ -1,5 +1,8 @@
+
+![Header image](header.png)
+
 # Visual Debug Tools
-Visual Debug Tools is a set of small utility tools for SwiftUI that lets you visually debug your views while building them. 
+Visual Debug Tools is a set of small utility tools for SwiftUI that let you visually debug your views while building them. 
 
 # Installation
 Visual Debug Tools are available through SPM. 
@@ -12,15 +15,12 @@ To visually debug a view just add the view modifier `.debug()`. This will show t
 
 ```swift
 struct DemoView: View {
-    
-    var title:String
-    
     var body: some View {
-        Text(title)
+        Text("Visual Debug Tools")
+            .font(.largeTitle)
             .debug()
     }
 }
-
 ```
 
 # Author
