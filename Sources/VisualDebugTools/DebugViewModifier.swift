@@ -30,7 +30,6 @@ public struct DebugViewModifier: ViewModifier {
                     .overlay(
                         CrosshairBorderShape()
                             .strokeBorder(showBorder ? color : .clear, lineWidth: 3)
-                        
                     )
                     .allowsHitTesting(false)
             })
@@ -38,6 +37,12 @@ public struct DebugViewModifier: ViewModifier {
 }
 
 public extension View {
+    /// Adds a debug overlay to view that colors the and shows size of view.
+    /// - Parameters:
+    ///   - color: Color of debug overlay
+    ///   - showSize: If it should show the size information
+    ///   - showBorder: If it should show a border around the view
+    /// - Returns: some View
     func debug(color:Color = .green, showSize:Bool = true, showBorder:Bool = true) -> some View {
         self.modifier(DebugViewModifier(color: color, showSize:showSize, showBorder:showBorder))
     }
